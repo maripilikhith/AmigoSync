@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment variables (SECRETS — never push these!)
+.env
+
+# Build output
+client/dist/
+
+# Capacitor / Android build (not needed for web deploy)
+client/android/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+server/logs.txt
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,401 @@
+I HAVE JUST STARTED THE PROJECT NAME AMIGO SYNK
+
+
+
+AND THIS IS THE PROMT I GAVE TO ANTIGRAVITY TO DO SO
+
+
+
+You are a senior full-stack software engineer and system architect.
+
+Your task is to design and generate the architecture and starter implementation for a **full-stack web application called "AmigoSync"**.
+
+AmigoSync is a smart group coordination platform that helps friends stay connected when they split into smaller groups during trips or outings.
+
+---
+
+PROJECT PROBLEM
+
+When a group of friends goes outside together (for example 8 friends going out from a college hostel), they often split into smaller groups to complete different tasks.
+
+Example:
+
+* 2 friends go shopping
+* 2 friends go to a restaurant
+* 4 friends go to the beach
+
+After finishing their activities, it becomes difficult to:
+
+* know where everyone is
+* communicate with specific subgroups
+* reconnect easily
+
+Existing messaging apps allow chatting but do not provide tools specifically for **trip coordination and subgroup management**.
+
+AmigoSync solves this problem by providing trip rooms, subgroup communication, live location sharing, and smart proximity alerts.
+
+---
+
+MAIN FEATURES
+
+1. USER AUTHENTICATION
+
+Users must be able to create accounts and log in.
+
+Authentication features:
+
+* Email and password login
+* Secure password hashing
+* JWT-based authentication
+* User profile
+
+User profile fields:
+
+* name
+* email
+* avatar/profile photo
+* phone number
+
+---
+
+2. TRIP ROOM SYSTEM
+
+Users can create a trip room when starting an outing.
+
+Room features:
+
+* create room
+* automatically generate unique room code
+* friends can join using the room code
+* view all members in the room
+
+Example:
+Room Name: Beach Trip
+Members: 8 friends
+
+---
+
+3. SUBGROUP MANAGEMENT
+
+Inside each room, users should be able to create subgroups.
+
+Examples:
+
+* Shopping Group
+* Food Group
+* Beach Group
+
+Features:
+
+* create subgroup
+* join subgroup
+* leave subgroup
+* see members of each subgroup
+
+---
+
+4. REAL-TIME CHAT SYSTEM
+
+Users should be able to send messages in real time.
+
+Messaging types:
+
+* message entire room
+* message a specific subgroup
+* private message to a single user
+
+Messages should appear instantly using WebSockets.
+
+---
+
+5. LIVE LOCATION SHARING
+
+Users can share their real-time location.
+
+Location sharing options:
+
+* share with entire room
+* share with subgroup
+* share with specific user
+
+Locations should appear on a map with user markers and names.
+
+Use Google Maps JavaScript API.
+
+---
+
+6. DIRECT CONTACT FEATURE
+
+Users should be able to click on a member profile and directly contact them.
+
+Features:
+
+* view member profile
+* see phone number
+* initiate phone call
+
+---
+
+7. SMART PROXIMITY ALERTS
+
+The system should detect when two friends are near each other.
+
+Example:
+User A location
+User B location
+
+If distance between them is less than 200 meters, the system sends a notification:
+
+"Your friend Rahul is nearby (150 meters away)."
+
+Use the Haversine formula to calculate distance between coordinates.
+
+---
+
+8. TRIP TIMELINE / ACTIVITY HISTORY
+
+The application should store location and activity history during the trip.
+
+Example timeline:
+10:00 AM – Left hostel
+10:30 AM – Arrived at beach
+12:00 PM – Lunch at restaurant
+2:00 PM – Shopping mall
+
+Users should be able to view the trip timeline and see the sequence of locations visited.
+
+---
+
+TECH STACK
+
+Frontend:
+React
+Vite
+TailwindCSS
+Socket.io client
+Google Maps JavaScript API
+
+Backend:
+Node.js
+Express.js
+Socket.io
+JWT authentication
+
+Database:
+MongoDB
+Mongoose ODM
+
+Real-time communication:
+Socket.io
+
+---
+
+PROJECT STRUCTURE
+
+Generate a scalable project folder structure.
+
+client/
+src/
+components/
+pages/
+hooks/
+services/
+utils/
+
+server/
+controllers/
+models/
+routes/
+middlewares/
+socket/
+utils/
+server.js
+
+---
+
+DATABASE MODELS
+
+Design MongoDB schemas for:
+
+Users
+
+* name
+* email
+* password
+* avatar
+* phone
+* createdAt
+
+Rooms
+
+* roomName
+* roomCode
+* createdBy
+* members
+* createdAt
+
+Groups
+
+* groupName
+* roomId
+* members
+
+Messages
+
+* sender
+* message
+* roomId
+* groupId
+* receiverId
+* timestamp
+
+Locations
+
+* userId
+* latitude
+* longitude
+* timestamp
+* sharedWith
+
+TripTimeline
+
+* roomId
+* userId
+* latitude
+* longitude
+* eventType
+* timestamp
+
+---
+
+BACKEND API ROUTES
+
+POST /register
+POST /login
+POST /create-room
+POST /join-room
+POST /create-group
+POST /join-group
+POST /leave-group
+GET /room-members
+POST /send-message
+POST /share-location
+
+---
+
+SOCKET EVENTS
+
+join_room
+send_message
+receive_message
+share_location
+location_update
+proximity_alert
+
+---
+
+FRONTEND PAGES
+
+Login page
+Register page
+Create room page
+Join room page
+Room dashboard
+Group management page
+Chat interface
+Live map page
+Trip timeline page
+
+---
+
+DELIVERABLES
+
+Generate:
+
+1. Complete project architecture
+2. Backend server setup
+3. MongoDB schemas
+4. API route implementation
+5. Socket.io real-time configuration
+6. React frontend structure
+7. Example UI components
+8. Environment variables required
+9. Steps to run project locally
+10. Instructions for deployment
+
+Write clean modular code with comments and scalable architecture so developers can easily continue building the project.
+
+
+
+========================================================================================================================
+
+
+
+	 i want you to make complete industry ready project of amigosynk
+
+
+========================================================================================================================
+
+         client/.env where is this file i cannot filnd it give me the path
+
+=======================================================================================================================
+
+JWT_SECRET=your_super_secret_jwt_key
+
+what is this and what should i do here
+
+
+=======================================================================================================================
+
+so i added the google maps key 
+now do the next steps
+
+
+=======================================================================================================================
+
+why is this website looking like this
+=======================================================================================================================
+please solve the whole problem and give the result after checking wheter its working i am allowing this time to test the website if its working 
+=======================================================================================================================
+see this and its true that i have not given any authenticaation for staroging and sign up how did you do that parat
+=======================================================================================================================
+sorry i dont have mongo db locally what should i go
+=======================================================================================================================
+ i have just added the mongo db in the server env add this is the ourput
+=======================================================================================================================
+what should i do here
+=======================================================================================================================
+its good but the functions are not working properly  i am not able to see the active group and not able to add other members
+=======================================================================================================================
+
+in the login page its not showing the current active page 
+
+and map funtion is not working properly and message option is not available for single projects
+
+ans the settings option also not working
+
+=======================================================================================================================
+when i  just logged in and trying to see the group i am in its not showing and if i try to join the group its not showing this
+
+so fix this
+
+1.by showing the rooms we entered in the past 
+2.display the current room we entered 
+
+make these changes  and give me the resule
+=======================================================================================================================
+when i am tryping to create a subgroup in a room its not aking whom to add into thr subgroup  who are in the room so chage thiss
+=======================================================================================================================
+make it possible to delete the grou which are created
+=======================================================================================================================
+when i am trying to delete  group its showing this
+=======================================================================================================================
+in this area its displaying the names and mailids of the person 
+
+1.make there numbers visible too
+2. make it possible to call them directly just by clicking on the phone icon
+=======================================================================================================================
+ 
+
+
+
