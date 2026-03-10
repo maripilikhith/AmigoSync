@@ -29,6 +29,8 @@ const configureSocket = (server) => {
     });
 
     const userLocations = {}; // ephemeral memory: { roomId: { userId: { lat, lng } } }
+    const proximityAlertCooldowns = {}; // { "userA-userB": lastAlertTimestamp }
+    const ALERT_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
 
     io.on('connection', (socket) => {
         console.log(`New client connected: ${socket.id}`);
@@ -80,15 +82,25 @@ const configureSocket = (server) => {
                         currentRoomUsers[otherUserId].latitude, currentRoomUsers[otherUserId].longitude
                     );
 
-                    if (distance < 200) { // If less than 200 meters, alert both
-                        // Alert current user
-                        io.to(socket.id).emit('proximity_alert', {
-                            message: `Your friend ${currentRoomUsers[otherUserId].userName} is nearby (${Math.round(distance)} meters away).`
-                        });
-                        // Alert other user
-                        io.to(currentRoomUsers[otherUserId].socketId).emit('proximity_alert', {
-                            message: `Your friend ${userName} is nearby (${Math.round(distance)} meters away).`
-                        });
+                    if (distance < 200) { // If less than 200 meters
+                        // Create a unique key for this user pair (sorted so A-B = B-A)
+                        const pairKey = [userId, otherUserId].sort().join('-');
+                        const now = Date.now();
+                        const lastAlert = proximityAlertCooldowns[pairKey] || 0;
+
+                        // Only send alert if 30 minutes have passed since last alert for this pair
+                        if (now - lastAlert >= ALERT_COOLDOWN_MS) {
+                            proximityAlertCooldowns[pairKey] = now;
+
+                            // Alert current user
+                            io.to(socket.id).emit('proximity_alert', {
+                                message: `Your friend ${currentRoomUsers[otherUserId].userName} is nearby (${Math.round(distance)} meters away).`
+                            });
+                            // Alert other user
+                            io.to(currentRoomUsers[otherUserId].socketId).emit('proximity_alert', {
+                                message: `Your friend ${userName} is nearby (${Math.round(distance)} meters away).`
+                            });
+                        }
                     }
                 }
             }
