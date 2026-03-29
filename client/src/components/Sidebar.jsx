@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserPlus, Hash, Copy, Plus, LogOut, Trash2, Phone } from 'lucide-react';
+import { Users, UserPlus, Hash, Copy, Plus, LogOut, Trash2, Phone, MapPin, MapPinOff } from 'lucide-react';
 import useAppStore from '../store/useAppStore';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import ProfilePhotoModal from './ProfilePhotoModal';
 
 const Sidebar = ({ isOpen, onClose }) => {
-    const { currentRoom, currentGroup, setCurrentGroup, userInfo, members } = useAppStore();
+    const { currentRoom, currentGroup, setCurrentGroup, userInfo, members, locationSharing, setLocationSharing } = useAppStore();
     const [groups, setGroups] = useState([]);
     const [newGroupName, setNewGroupName] = useState('');
     const [isCreatingGroup, setIsCreatingGroup] = useState(false);
@@ -135,6 +135,27 @@ const Sidebar = ({ isOpen, onClose }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-8">
+                {/* Location Sharing Toggle */}
+                <button
+                    onClick={() => setLocationSharing(!locationSharing)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm transition-all border ${
+                        locationSharing
+                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                    }`}
+                >
+                    <div className="flex items-center space-x-2">
+                        {locationSharing ? <MapPin size={18} /> : <MapPinOff size={18} />}
+                        <span>{locationSharing ? 'Location Sharing ON' : 'Location Sharing OFF'}</span>
+                    </div>
+                    <div className={`w-10 h-6 rounded-full relative transition-colors ${
+                        locationSharing ? 'bg-green-500' : 'bg-gray-300'
+                    }`}>
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                            locationSharing ? 'translate-x-5' : 'translate-x-1'
+                        }`}></div>
+                    </div>
+                </button>
                 {/* Members Section */}
                 <section>
                     <div className="flex items-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 px-2">
@@ -150,11 +171,13 @@ const Sidebar = ({ isOpen, onClose }) => {
                                         alt={member.name}
                                         className="w-10 h-10 rounded-full object-cover border border-indigo-200 shrink-0 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
                                         onClick={(e) => { e.stopPropagation(); setPhotoMember(member); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setPhotoMember(member); }}
                                     />
                                 ) : (
                                     <div
                                         className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 shrink-0 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
                                         onClick={(e) => { e.stopPropagation(); setPhotoMember(member); }}
+                                        onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setPhotoMember(member); }}
                                     >
                                         {member.name.charAt(0).toUpperCase()}
                                     </div>

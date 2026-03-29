@@ -11,7 +11,7 @@ import SettingsModal from '../components/SettingsModal';
 import { LogOut, Map, Settings, Users, MessageSquare } from 'lucide-react';
 
 const Dashboard = () => {
-    const { currentRoom, currentGroup, userInfo, updateOnlineUser, setOnlineUsers, logout, members, setMembers } = useAppStore();
+    const { currentRoom, currentGroup, userInfo, updateOnlineUser, setOnlineUsers, logout, members, setMembers, locationSharing, setLocationSharing } = useAppStore();
     const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'map'
     const [showSidebar, setShowSidebar] = useState(true);
     const [showSettings, setShowSettings] = useState(false);
@@ -53,44 +53,67 @@ const Dashboard = () => {
                 updateOnlineUser(data);
             });
 
-
-
-            // Start broadcasting own location
-            const watcherId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const locationData = {
-                        roomId: currentRoom._id,
-                        userId: userInfo._id,
-                        userName: userInfo.name,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    };
-                    updateOnlineUser(locationData); // Update self
-                    socket.emit('location_update', locationData);
-                },
-                (error) => {
-                    console.log('Geolocation error:', error);
-                    // Handle typical HTTP/HTTPS security error
-                    if (error.code === 1 || error.message.includes('Only secure origins are allowed')) {
-                        toast.error("Location blocked: Mobile browsers require HTTPS or an actual app.", { duration: 6000 });
-                    }
-                },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
-
-            setLocationWatcher(watcherId);
-
             return () => {
-                if (watcherId !== null) navigator.geolocation.clearWatch(watcherId);
                 socket.off('receive_message');
                 socket.off('share_location');
-
             };
         }
     }, [currentRoom, userInfo]);
 
+    // Location sharing — only runs when the toggle is ON
+    useEffect(() => {
+        if (!currentRoom || !userInfo || !locationSharing) {
+            return;
+        }
+
+        const watcherId = navigator.geolocation.watchPosition(
+            (position) => {
+                const locationData = {
+                    roomId: currentRoom._id,
+                    userId: userInfo._id,
+                    userName: userInfo.name,
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                };
+                updateOnlineUser(locationData);
+                socket.emit('location_update', locationData);
+            },
+            (error) => {
+                console.log('Geolocation error:', error);
+                if (error.code === 1 || error.message.includes('Only secure origins are allowed')) {
+                    toast.error("Location blocked: enable location permissions or use HTTPS.", { duration: 6000 });
+                    setLocationSharing(false);
+                }
+            },
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+
+        setLocationWatcher(watcherId);
+
+        return () => {
+            navigator.geolocation.clearWatch(watcherId);
+            setLocationWatcher(null);
+        };
+    }, [currentRoom, userInfo, locationSharing]);
+
+    // Prevent browser back button from going to login page
+    useEffect(() => {
+        const handlePopState = (e) => {
+            // Push state back so we stay on dashboard
+            window.history.pushState(null, '', '/dashboard');
+        };
+
+        window.history.pushState(null, '', '/dashboard');
+        window.addEventListener('popstate', handlePopState);
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+
     const handleLeaveTrip = () => {
         if (locationWatcher !== null) navigator.geolocation.clearWatch(locationWatcher);
+        setLocationSharing(false);
         socket.disconnect();
         useAppStore.getState().setCurrentRoom(null);
         useAppStore.getState().setCurrentGroup(null);

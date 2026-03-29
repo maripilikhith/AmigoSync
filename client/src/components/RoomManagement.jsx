@@ -93,11 +93,13 @@ const RoomManagement = ({ onRoomJoined }) => {
                                 alt={userInfo.name}
                                 className="w-12 h-12 shrink-0 rounded-full object-cover border border-brand-200 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
                                 onClick={() => setShowPhoto(true)}
+                                onTouchEnd={(e) => { e.preventDefault(); setShowPhoto(true); }}
                             />
                         ) : (
                             <div
                                 className="w-12 h-12 shrink-0 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 font-bold text-xl cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
                                 onClick={() => setShowPhoto(true)}
+                                onTouchEnd={(e) => { e.preventDefault(); setShowPhoto(true); }}
                             >
                                 {userInfo?.name?.charAt(0).toUpperCase()}
                             </div>

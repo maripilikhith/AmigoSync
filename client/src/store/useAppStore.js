@@ -7,6 +7,7 @@ const useAppStore = create((set) => ({
     messages: [],
     onlineUsers: [],
     members: [], // All members of the current room
+    locationSharing: false, // off by default to save battery
 
     setUserInfo: (info) => {
         if (info) {
@@ -31,9 +32,11 @@ const useAppStore = create((set) => ({
         onlineUsers: { ...state.onlineUsers, [user.userId]: user }
     })),
 
+    setLocationSharing: (val) => set({ locationSharing: val }),
+
     logout: () => {
         localStorage.removeItem('userInfo');
-        set({ userInfo: null, currentRoom: null, currentGroup: null, messages: [], onlineUsers: [], members: [] });
+        set({ userInfo: null, currentRoom: null, currentGroup: null, messages: [], onlineUsers: [], members: [], locationSharing: false });
     }
 }));
 

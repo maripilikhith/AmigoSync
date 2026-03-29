@@ -11,7 +11,11 @@ function App() {
             <Toaster position="top-center" />
             <Router>
                 <Routes>
-                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    <Route path="/" element={
+                        localStorage.getItem('userInfo')
+                            ? <Navigate to="/dashboard" replace />
+                            : <Navigate to="/login" replace />
+                    } />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Login />} />
                     <Route
