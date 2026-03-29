@@ -9,6 +9,28 @@ const defaultCenter = {
     lng: 77.2090
 }; // Defaulting to New Delhi
 
+// Haversine formula to calculate distance between two points in meters
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371e3;
+    const toRadians = angle => angle * (Math.PI / 180);
+    const phi1 = toRadians(lat1);
+    const phi2 = toRadians(lat2);
+    const deltaPhi = toRadians(lat2 - lat1);
+    const deltaLambda = toRadians(lon2 - lon1);
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+        Math.cos(phi1) * Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+};
+
+const formatDistance = (meters) => {
+    if (meters < 1000) {
+        return `${Math.round(meters)} m away`;
+    }
+    return `${(meters / 1000).toFixed(1)} km away`;
+};
+
 // Array of vibrant colors for markers
 const markerColors = [
     '#e11d48', // rose-600
@@ -149,6 +171,14 @@ const LiveMap = ({ isVisible }) => {
                                 <p className="font-bold text-gray-800 m-0 leading-none">
                                     {user.userName} {user.userId === userInfo?._id ? '(You)' : ''}
                                 </p>
+                                {user.userId !== userInfo?._id && myLocation && (
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+                                        📍 {formatDistance(calculateDistance(
+                                            myLocation.latitude, myLocation.longitude,
+                                            user.latitude, user.longitude
+                                        ))}
+                                    </p>
+                                )}
                             </div>
                         </Popup>
                     </Marker>

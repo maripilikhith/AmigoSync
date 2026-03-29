@@ -53,9 +53,7 @@ const Dashboard = () => {
                 updateOnlineUser(data);
             });
 
-            socket.on('proximity_alert', (data) => {
-                toast(data.message, { icon: '🔔', duration: 5000 });
-            });
+
 
             // Start broadcasting own location
             const watcherId = navigator.geolocation.watchPosition(
@@ -86,7 +84,7 @@ const Dashboard = () => {
                 if (watcherId !== null) navigator.geolocation.clearWatch(watcherId);
                 socket.off('receive_message');
                 socket.off('share_location');
-                socket.off('proximity_alert');
+
             };
         }
     }, [currentRoom, userInfo]);

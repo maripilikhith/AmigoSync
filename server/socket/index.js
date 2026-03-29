@@ -1,24 +1,5 @@
 const socketIo = require('socket.io');
 
-// Haversine formula to calculate distance between two points in meters
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371e3; // Earth radius in meters
-    const toRadians = angle => angle * (Math.PI / 180);
-
-    const phi1 = toRadians(lat1);
-    const phi2 = toRadians(lat2);
-    const deltaPhi = toRadians(lat2 - lat1);
-    const deltaLambda = toRadians(lon2 - lon1);
-
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-        Math.cos(phi1) * Math.cos(phi2) *
-        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // Distance in meters
-};
-
 const configureSocket = (server) => {
     const io = socketIo(server, {
         cors: {
@@ -29,8 +10,6 @@ const configureSocket = (server) => {
     });
 
     const userLocations = {}; // ephemeral memory: { roomId: { userId: { lat, lng } } }
-    const proximityAlertCooldowns = {}; // { "userA-userB": lastAlertTimestamp }
-    const ALERT_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
 
     io.on('connection', (socket) => {
         console.log(`New client connected: ${socket.id}`);
@@ -62,7 +41,7 @@ const configureSocket = (server) => {
             }
         });
 
-        // Location Sharing & Proximity Alerts (200 meters)
+        // Location Sharing (map only, no proximity alerts)
         socket.on('location_update', (data) => {
             const { roomId, userId, userName, latitude, longitude } = data;
 
@@ -72,43 +51,10 @@ const configureSocket = (server) => {
 
             // Broadcast location to others in room
             socket.to(roomId).emit('share_location', data);
-
-            // Check proximity
-            const currentRoomUsers = userLocations[roomId];
-            for (const otherUserId in currentRoomUsers) {
-                if (otherUserId !== userId) {
-                    const distance = calculateDistance(
-                        latitude, longitude,
-                        currentRoomUsers[otherUserId].latitude, currentRoomUsers[otherUserId].longitude
-                    );
-
-                    if (distance < 200) { // If less than 200 meters
-                        // Create a unique key for this user pair (sorted so A-B = B-A)
-                        const pairKey = [userId, otherUserId].sort().join('-');
-                        const now = Date.now();
-                        const lastAlert = proximityAlertCooldowns[pairKey] || 0;
-
-                        // Only send alert if 30 minutes have passed since last alert for this pair
-                        if (now - lastAlert >= ALERT_COOLDOWN_MS) {
-                            proximityAlertCooldowns[pairKey] = now;
-
-                            // Alert current user
-                            io.to(socket.id).emit('proximity_alert', {
-                                message: `Your friend ${currentRoomUsers[otherUserId].userName} is nearby (${Math.round(distance)} meters away).`
-                            });
-                            // Alert other user
-                            io.to(currentRoomUsers[otherUserId].socketId).emit('proximity_alert', {
-                                message: `Your friend ${userName} is nearby (${Math.round(distance)} meters away).`
-                            });
-                        }
-                    }
-                }
-            }
         });
 
         socket.on('disconnect', () => {
             console.log(`Client disconnected: ${socket.id}`);
-            // Consider clearing tracked user location logic if necessary
         });
     });
 
