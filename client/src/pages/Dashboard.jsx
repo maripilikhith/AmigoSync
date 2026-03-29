@@ -80,12 +80,21 @@ const Dashboard = () => {
             },
             (error) => {
                 console.log('Geolocation error:', error);
-                if (error.code === 1 || error.message.includes('Only secure origins are allowed')) {
-                    toast.error("Location blocked: enable location permissions or use HTTPS.", { duration: 6000 });
+                if (error.code === 1) {
+                    toast.error("Location permission denied. Please enable it in browser settings.", { duration: 5000 });
+                    setLocationSharing(false);
+                } else if (error.code === 2) {
+                    toast.error("Location unavailable. Try moving to an open area.", { duration: 5000 });
+                } else if (error.code === 3) {
+                    // Mobile took too long to get GPS fix, we ignore timeouts silently so it keeps trying
+                    console.log("Location timeout, waiting for fix...");
+                } else {
+                    toast.error("Location blocked: use HTTPS or enable permissions.");
                     setLocationSharing(false);
                 }
             },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            // high accuracy on, 15s timeout for initial lock (mobile needs more time), accept 10s old cached coords immediately
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
 
         setLocationWatcher(watcherId);
@@ -96,27 +105,36 @@ const Dashboard = () => {
         };
     }, [currentRoom, userInfo, locationSharing]);
 
-    // Prevent browser back button from going to login page
+    // Manage history state exclusively for Room entering/leaving
     useEffect(() => {
-        const handlePopState = (e) => {
-            // Push state back so we stay on dashboard
-            window.history.pushState(null, '', '/dashboard');
+        if (currentRoom) {
+            window.history.pushState({ inRoom: true }, '', '/dashboard');
+        }
+    }, [currentRoom?._id]);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            const state = useAppStore.getState();
+            if (state.currentRoom) {
+                // Inside a trip room → clean up and go back to home page
+                state.setLocationSharing(false);
+                socket.disconnect();
+                state.setCurrentRoom(null);
+                state.setCurrentGroup(null);
+                // We let the browser naturally go back (don't pushState again)
+            }
         };
 
-        window.history.pushState(null, '', '/dashboard');
         window.addEventListener('popstate', handlePopState);
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
+        return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
     const handleLeaveTrip = () => {
-        if (locationWatcher !== null) navigator.geolocation.clearWatch(locationWatcher);
-        setLocationSharing(false);
+        useAppStore.getState().setLocationSharing(false);
         socket.disconnect();
         useAppStore.getState().setCurrentRoom(null);
         useAppStore.getState().setCurrentGroup(null);
+        window.history.back(); // Pop the state we added when entering the room
     };
 
     if (!currentRoom) {
