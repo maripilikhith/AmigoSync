@@ -1,17 +1,19 @@
 # AmigoSync
 
-AmigoSync is a smart group coordination platform that helps friends stay connected when they split into smaller groups during trips or outings. It features real-time chat, live location tracking, and smart proximity alerts.
+AmigoSync is a smart group coordination platform that helps friends stay connected when they split into smaller groups during trips or outings. It features real-time chat, live location tracking on an interactive map, subgroup management, and direct messaging.
 
 ## Project Architecture
 
-* **Frontend**: React (Vite), Tailwind CSS, Socket.io-client, React Router.
+* **Frontend**: React (Vite), Tailwind CSS, Socket.io-client, React Router, Leaflet.js (OpenStreetMap).
 * **Backend**: Node.js, Express.js, Socket.io, MongoDB/Mongoose.
 * **Authentication**: JWT-based authentication.
+* **Image Hosting**: Cloudinary for profile photo uploads.
 
 ## Prerequisites
 
 * Node.js (v16 or higher)
 * MongoDB (Local instance or MongoDB Atlas)
+* Cloudinary account (for profile photo uploads)
 
 ## Environment Variables
 
@@ -26,7 +28,8 @@ JWT_SECRET=your_super_secret_jwt_key
 ### Frontend (`client/.env`)
 Create a `.env` file in the `client` directory (Vite automatically handles variables prefixed with `VITE_`):
 ```env
-VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+VITE_CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_cloudinary_upload_preset
 ```
 
 ## Running the Project Locally
@@ -54,11 +57,15 @@ The frontend will normally be available at `http://localhost:3000` or whatever p
 
 ## Core Features Implemented
 
-* **User Authentication**: Secure password hashing and JWT issuance.
-* **Room & Group System**: Automatic 6-character shortcode generation for trips.
-* **Real-time Messaging**: Enabled by Socket.io, bridging frontend UI events directly with backend event listeners.
-* **Live Proximity Alerts**: Built-in Haversine formula calculates coordinates; if under 200 meters, alerts are fired dynamically to both users.
+* **User Authentication**: Secure password hashing (bcrypt) and JWT issuance, with password change support.
+* **Profile Management**: Upload profile photos via Cloudinary, update name, phone, and password.
+* **Trip (Room) System**: Automatic 6-character shortcode generation for trips. Admin-only trip deletion.
+* **Subgroups**: Create smaller groups within a trip for specific activities. Creator and Admin can delete subgroups.
+* **Direct Messaging**: Private 1-on-1 chats between trip members.
+* **Real-time Messaging**: Powered by Socket.io for instant message delivery.
+* **Live Map**: Interactive Leaflet.js map showing all online members' locations with distance indicators (OpenStreetMap — no API key required).
+* **Admin Controls**: Trip creator is marked as ADMIN and has elevated permissions for group and trip deletion.
 
 ---
 
-*This is a starter boilerplate carefully generated to provide scalable monolithic structure for the vision of AmigoSync.*
+*AmigoSync — Keeping friends in sync during group activities.*
