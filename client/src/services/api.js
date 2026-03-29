@@ -29,8 +29,9 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
+            // Only clear session — don't hard redirect.
+            // ProtectedRoute will handle the redirect naturally.
             localStorage.removeItem('userInfo');
-            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

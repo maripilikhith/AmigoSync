@@ -137,11 +137,19 @@ const Sidebar = ({ isOpen, onClose }) => {
             <div className="flex-1 overflow-y-auto p-4 space-y-8">
                 {/* Location Sharing Toggle */}
                 <button
-                    onClick={() => setLocationSharing(!locationSharing)}
+                    onClick={() => {
+                        const newVal = !locationSharing;
+                        setLocationSharing(newVal);
+                        if (newVal) {
+                            toast.success('📍 Location sharing is ON', { duration: 2000 });
+                        } else {
+                            toast('📍 Location sharing is OFF', { duration: 2000 });
+                        }
+                    }}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm transition-all border ${
                         locationSharing
-                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100 active:bg-green-200'
+                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100 active:bg-gray-200'
                     }`}
                 >
                     <div className="flex items-center space-x-2">

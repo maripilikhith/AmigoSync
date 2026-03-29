@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useAppStore from '../store/useAppStore';
 import api from '../services/api';
@@ -9,7 +9,12 @@ const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { setUserInfo } = useAppStore();
+    const { setUserInfo, userInfo } = useAppStore();
+
+    // If already logged in, go straight to dashboard
+    if (userInfo) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     const [formData, setFormData] = useState({
         name: '',
@@ -34,7 +39,7 @@ const Login = () => {
 
             setUserInfo(data);
             toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
-            navigate('/dashboard');
+            navigate('/dashboard', { replace: true });
         } catch (error) {
             toast.error(error.response?.data?.message || 'Authentication failed');
         } finally {
