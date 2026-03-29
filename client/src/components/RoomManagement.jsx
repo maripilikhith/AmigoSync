@@ -4,6 +4,7 @@ import api from '../services/api';
 import useAppStore from '../store/useAppStore';
 import { Users, Plus, Hash, Clock, Settings, Trash2 } from 'lucide-react';
 import SettingsModal from './SettingsModal';
+import ProfilePhotoModal from './ProfilePhotoModal';
 
 const RoomManagement = ({ onRoomJoined }) => {
     const [roomCode, setRoomCode] = useState('');
@@ -12,6 +13,7 @@ const RoomManagement = ({ onRoomJoined }) => {
     const [myRooms, setMyRooms] = useState([]);
     const { setCurrentRoom, userInfo, logout } = useAppStore();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
         const fetchMyRooms = async () => {
@@ -86,9 +88,17 @@ const RoomManagement = ({ onRoomJoined }) => {
                 <div className="md:col-span-2 bg-white rounded-2xl shadow-sm p-4 md:p-6 flex items-center border border-gray-100 mb-4 gap-4">
                     <div className="flex items-center space-x-4 min-w-0 w-full">
                         {userInfo?.avatar ? (
-                            <img src={userInfo.avatar} alt={userInfo.name} className="w-12 h-12 shrink-0 rounded-full object-cover border border-brand-200" />
+                            <img
+                                src={userInfo.avatar}
+                                alt={userInfo.name}
+                                className="w-12 h-12 shrink-0 rounded-full object-cover border border-brand-200 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
+                                onClick={() => setShowPhoto(true)}
+                            />
                         ) : (
-                            <div className="w-12 h-12 shrink-0 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 font-bold text-xl">
+                            <div
+                                className="w-12 h-12 shrink-0 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 font-bold text-xl cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
+                                onClick={() => setShowPhoto(true)}
+                            >
                                 {userInfo?.name?.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -206,6 +216,12 @@ const RoomManagement = ({ onRoomJoined }) => {
                 )}
 
             </div>
+            <ProfilePhotoModal
+                isOpen={showPhoto}
+                onClose={() => setShowPhoto(false)}
+                name={userInfo?.name}
+                avatarUrl={userInfo?.avatar}
+            />
         </div>
     );
 };

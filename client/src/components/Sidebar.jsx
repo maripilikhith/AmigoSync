@@ -3,6 +3,7 @@ import { Users, UserPlus, Hash, Copy, Plus, LogOut, Trash2, Phone } from 'lucide
 import useAppStore from '../store/useAppStore';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import ProfilePhotoModal from './ProfilePhotoModal';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const { currentRoom, currentGroup, setCurrentGroup, userInfo, members } = useAppStore();
@@ -10,6 +11,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     const [newGroupName, setNewGroupName] = useState('');
     const [isCreatingGroup, setIsCreatingGroup] = useState(false);
     const [selectedMembers, setSelectedMembers] = useState([]);
+    const [photoMember, setPhotoMember] = useState(null);
 
     useEffect(() => {
         if (currentRoom) {
@@ -112,6 +114,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     };
 
     return (
+        <>
         <div className={`fixed inset-y-0 left-0 w-80 bg-white shadow-2xl z-40 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col border-r border-gray-100`}>
 
             {/* Header / Room Info */}
@@ -142,9 +145,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                         {members.map(member => (
                             <div key={member._id} onClick={() => handleOpenDM(member._id)} className={`flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors ${member._id !== userInfo?._id ? 'cursor-pointer' : ''}`}>
                                 {member.avatar ? (
-                                    <img src={member.avatar} alt={member.name} className="w-10 h-10 rounded-full object-cover border border-indigo-200 shrink-0" />
+                                    <img
+                                        src={member.avatar}
+                                        alt={member.name}
+                                        className="w-10 h-10 rounded-full object-cover border border-indigo-200 shrink-0 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
+                                        onClick={(e) => { e.stopPropagation(); setPhotoMember(member); }}
+                                    />
                                 ) : (
-                                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 shrink-0">
+                                    <div
+                                        className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 shrink-0 cursor-pointer hover:ring-2 hover:ring-brand-400 transition-all"
+                                        onClick={(e) => { e.stopPropagation(); setPhotoMember(member); }}
+                                    >
                                         {member.name.charAt(0).toUpperCase()}
                                     </div>
                                 )}
@@ -276,6 +287,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </section>
             </div>
         </div>
+
+        <ProfilePhotoModal
+            isOpen={!!photoMember}
+            onClose={() => setPhotoMember(null)}
+            name={photoMember?.name}
+            avatarUrl={photoMember?.avatar}
+        />
+        </>
     );
 };
 
